@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
@@ -24,6 +25,9 @@ function RegistrationScreen() {
      var passwordField
 
      
+    // Create a JS object like an HTML form element 
+    var formData = new FormData();
+
     function register() {
 
 
@@ -49,16 +53,55 @@ function RegistrationScreen() {
         // 3. If any field is not validated, go to "client error"
         if( errors.length > 0 ) {
             setFormState("client error");
+            setErrorsState( errors );
         }
 
         // 4. If all fields are valid
+        else {
             // 5. Go to "loading"
+            setFormState("loading");
+            setErrorsState([]);
+
             // 6. Send data backend
+            formData.append('firstName', firstNameField.value);
+            formData.append('lastName', lastNameField.value);
+            formData.append('email', emailField.value);
+            formData.append('password', passwordField.value);
+
+            fetch(
+                'http://localhost:3001/users/register',
+                {
+                    'method': 'POST',
+                    'body': formData
+                }
+            )
+            .then(
+                function(backendResponse) {
+                    // Convert the HTTP string response to JSON
+                    return backendResponse.json();
+                }
+            )
+            .then(
                 // 7. If backend sends success, go to "success"
+                function(jsonResponse) {
+                    if(jsonResponse.status === "ok") {
+                        console.log('backend response /users/register', jsonResponse)
+                        setFormState("success");
+                    }
+                    else {
+                        setFormState("backend error");
+                    }
+                }
+            )
+            .catch(
                 // 8. If backends sends error, go to "backend error"
+                function(backendError) {
+                    console.log('backendError at /users/register', backendError)
+                    setFormState("backend error");
+                }
+            )
+        }
     }
-
-
 
     return (
         <Container maxWidth="sm">
@@ -67,6 +110,7 @@ function RegistrationScreen() {
                     Registration
                 </Typography>
             </Box>
+
             <Box mt={4} mb={2}>
                 <FormControl fullWidth sx={ { mb: 2 } }>
                     <TextField 
@@ -110,7 +154,16 @@ function RegistrationScreen() {
             </Box>
 
             <Box display="flex">
-                <Button onClick={register} size="large" variant="contained">Send</Button>
+                
+                {
+                    formState !== "loading" &&
+                    <Button onClick={register} size="large" variant="contained">Send</Button>
+                }
+                
+                {
+                    formState === "loading" &&
+                    <CircularProgress />
+                }
             </Box>
 
             <Box mt={2}>
@@ -129,7 +182,6 @@ function RegistrationScreen() {
                     </Alert>
                 }
             </Box>
-
         </Container>
     )
 
