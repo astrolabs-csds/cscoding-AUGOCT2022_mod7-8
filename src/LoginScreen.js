@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useContext } from 'react';
+import { UserContext } from './UserContext.js';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -9,53 +10,29 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 
 
-function RegistrationScreen() {
+function LoginScreen() {
 
     // The states are: 
     // (1) null, (2) "client error", (3) "backend error", (4) "loading", (5) "success"
 
     var [formState, setFormState] = useState(null);
     var [errorsState, setErrorsState] = useState([]);
+    var { updateUser } = useContext(UserContext);
 
 
     // 1. Declare variables (not defined)
-    var firstNameField;
-    var lastNameField;
     var emailField;
     var passwordField;
-    var avatarField;
 
      
     // Create a JS object like an HTML form element 
     var formData = new FormData();
-
-    function attachFile(evt) {
-
-        console.log('file data', evt.target.files)
-        // Creating an array from the files attached by user
-        var files = Array.from(evt.target.files);
-
-        files.forEach(
-            function(fileAttachment, index) {
-                formData.append(index, fileAttachment);
-            }
-        )
-    }
-
 
     function register() {
 
 
         // 2. Validate the fields
         var errors = [];
-
-        if(firstNameField.value.length === 0) {
-            errors.push('Please enter your first name');
-        }
-
-        if(lastNameField.value.length === 0) {
-            errors.push('Please enter your last name');
-        }
 
         if(emailField.value.length === 0) {
             errors.push('Please enter your email');
@@ -78,13 +55,11 @@ function RegistrationScreen() {
             setErrorsState([]);
 
             // 6. Send data backend
-            formData.append('firstName', firstNameField.value);
-            formData.append('lastName', lastNameField.value);
             formData.append('email', emailField.value);
             formData.append('password', passwordField.value);
 
             fetch(
-                'http://localhost:3001/users/register',
+                'http://localhost:3001/users/login',
                 {
                     'method': 'POST',
                     'body': formData
@@ -102,6 +77,17 @@ function RegistrationScreen() {
                     if(jsonResponse.status === "ok") {
                         console.log('backend response /users/register', jsonResponse)
                         setFormState("success");
+
+                        // Update the user context
+                        updateUser(
+                            {
+                                "email": jsonResponse.message.email,
+                                "firstName": jsonResponse.message.firstName,
+                                "lastName": jsonResponse.message.lastName,
+                                "avatar": jsonResponse.message.avatar,
+                                "jsonwebtoken": jsonResponse.message.jsonwebtoken
+                            }
+                        )
                     }
                     else {
                         setFormState("backend error");
@@ -126,31 +112,11 @@ function RegistrationScreen() {
         <Container maxWidth="sm">
             <Box pt={8}>
                 <Typography component="h1" variant="h2">
-                    Registration
+                    Login
                 </Typography>
             </Box>
 
             <Box mt={4} mb={2}>
-                <FormControl fullWidth sx={ { mb: 2 } }>
-                    <TextField 
-                    inputRef={ 
-                        function( thisElement ){
-                            firstNameField = thisElement;
-                        } 
-                    }
-                    label="Firstname" required={true}/>
-                </FormControl>
-
-                <FormControl fullWidth sx={{ mb: 2 }}>
-                   <TextField 
-                   inputRef={ 
-                        function( thisElement ){
-                            lastNameField = thisElement;
-                        } 
-                    }
-                   label="Lastname" required={true}/>
-                </FormControl>
-
                 <FormControl fullWidth sx={{ mb: 2 }}>
                     <TextField 
                     inputRef={ 
@@ -171,28 +137,6 @@ function RegistrationScreen() {
                     label="Password" required={true} />
                 </FormControl>
             </Box>
-
-            <Box mt={4} mb={4}>
-
-                <Typography component="p" variant="body1" gutterBottom>
-                    Upload your profile picture (optional)
-                </Typography>
-
-                <br/>
-
-                <Button size="small" variant="contained" component="label">
-                    Upload
-                    <input 
-                        ref={function(thisElement){ avatarField = thisElement }} 
-                        onClick={attachFile}
-                        onChange={attachFile}
-                        hidden accept="image/*" 
-                        multiple type="file" 
-                    />
-                </Button>
-
-            </Box>
-
 
             <Box display="flex">
                 
@@ -223,7 +167,7 @@ function RegistrationScreen() {
                 {
                     formState === "success" &&
                     <Alert severity="success">
-                        You have registered successfully!
+                        You have logged in successfully!
                     </Alert>
                 }
             </Box>
@@ -232,4 +176,4 @@ function RegistrationScreen() {
 
 }
 
-export default RegistrationScreen;
+export default LoginScreen;
