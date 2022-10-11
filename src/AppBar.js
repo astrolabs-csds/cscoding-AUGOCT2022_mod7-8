@@ -18,7 +18,8 @@ import { UserContext } from './UserContext'
 const pages = ['Home', 'Registration'];
 const paths = ['/', '/registration'];
 
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const settings = ['Profile', 'Logout'];
+const settingsPath = ['/profile']
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
@@ -154,9 +155,14 @@ const ResponsiveAppBar = () => {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
+              {settings.map((setting, i) => (
+                
+                setting === 'Logout' ? 
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>
                   <Typography textAlign="center">{setting}</Typography>
+                </MenuItem> :
+                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                  <LinkComponent to={settingsPath[i]}>{setting}</LinkComponent>
                 </MenuItem>
               ))}
             </Menu>
