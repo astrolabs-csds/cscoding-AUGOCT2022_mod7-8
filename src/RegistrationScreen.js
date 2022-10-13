@@ -84,7 +84,7 @@ function RegistrationScreen() {
             formData.append('password', passwordField.value);
 
             fetch(
-                'http://localhost:3001/users/register',
+                `${process.env.REACT_APP_BACKEND_ENDPOINT}/users/register`,
                 {
                     'method': 'POST',
                     'body': formData

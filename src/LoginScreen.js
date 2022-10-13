@@ -59,7 +59,7 @@ function LoginScreen() {
             formData.append('password', passwordField.value);
 
             fetch(
-                'http://localhost:3001/users/login',
+                `${process.env.REACT_APP_BACKEND_ENDPOINT}/users/login`,
                 {
                     'method': 'POST',
                     'body': formData

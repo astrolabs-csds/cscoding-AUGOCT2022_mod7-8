@@ -22,6 +22,10 @@ const settings = ['Profile', 'Logout'];
 const settingsPath = ['/profile']
 
 const ResponsiveAppBar = () => {
+
+
+  const { avatar, updateUser } = React.useContext( UserContext );
+
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -40,7 +44,16 @@ const ResponsiveAppBar = () => {
     setAnchorElUser(null);
   };
 
-  var {firstName} = React.useContext(UserContext)
+  function logoutAndCloseMenu() {
+
+    // Clear the data from disk
+    localStorage.clear();
+
+    // Reset the UserContext component
+    updateUser({})
+
+    setAnchorElUser(null);
+  }
 
   return (
     <AppBar position="static">
@@ -118,7 +131,7 @@ const ResponsiveAppBar = () => {
               textDecoration: 'none',
             }}
           >
-            LOGO {firstName}
+            LOGO
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page, i) => (
@@ -136,7 +149,7 @@ const ResponsiveAppBar = () => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="Remy Sharp" src={avatar} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -158,7 +171,7 @@ const ResponsiveAppBar = () => {
               {settings.map((setting, i) => (
                 
                 setting === 'Logout' ? 
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem key={setting} onClick={logoutAndCloseMenu}>
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem> :
                 <MenuItem key={setting} onClick={handleCloseUserMenu}>

@@ -5,6 +5,7 @@ import AboutScreen from "./AboutScreen";
 import ProfileScreen from "./ProfileScreen";
 import RegistrationScreen from "./RegistrationScreen";
 import LayoutRoute from './LayoutRoute';
+import PrivateLayoutRoute from './PrivateLayoutRoute';
 import LoginScreen from './LoginScreen';
 
 import {UserContext} from './UserContext';
@@ -16,7 +17,7 @@ function App() {
   useEffect(
     function() {
       // fetch function
-      fetch(`http://localhost:3001/users/find`,{
+      fetch(`${process.env.REACT_APP_BACKEND_ENDPOINT}/users/find`,{
         "method": 'POST',
         "headers": {
             //"Content-Type": "multipart/form-data"
@@ -62,7 +63,7 @@ function App() {
           <Switch>
             <LayoutRoute path="/" component={HomeScreen} exact={true} />
             <LayoutRoute path="/about" component={AboutScreen} exact={true} />
-            <LayoutRoute path="/profile" component={ProfileScreen} exact={true} />
+            <PrivateLayoutRoute path="/profile" component={ProfileScreen} exact={true} />
             <LayoutRoute path="/registration" component={RegistrationScreen} exact={true} />
             <LayoutRoute path="/login" component={LoginScreen} exact={true} />
           </Switch>
