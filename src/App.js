@@ -12,7 +12,7 @@ import {UserContext} from './UserContext';
 
 function App() {
 
-  const { updateUser } = useContext(UserContext);
+  const { jsonwebtoken, updateUser } = useContext(UserContext);
 
   useEffect(
     function() {
@@ -31,18 +31,17 @@ function App() {
 
       // If Promise was successful
       .then(
-          (response) => {
-              console.log(response);
-              
+          (response) => {              
               // Turn off preloader and reveal success message
               updateUser(
                 {
-                  firstName: response.message.firstName,
-                  lastName: response.message.lastName,
-                  email: response.message.email,
-                  password: response.message.password,
-                  avatar: response.message.avatar,
-                  phone: response.message.phone
+                  "firstName": response.message.firstName,
+                  "lastName": response.message.lastName,
+                  "email": response.message.email,
+                  "password": response.message.password,
+                  "avatar": response.message.avatar,
+                  "phone": response.message.phone,
+                  "jsonwebtoken": jsonwebtoken || response.message.jsonwebtoken
                 }
               )
           }

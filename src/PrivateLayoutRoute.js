@@ -6,9 +6,9 @@ import { UserContext } from './UserContext.js';
 
 function PrivateLayoutRoute(props) {
 
-    var { jsonwebtoken } = useContext( UserContext )
+    var { loggedIn } = useContext( UserContext )
 
-    if (jsonwebtoken) { 
+    if (loggedIn) { 
         return (
             <React.Fragment>
 
@@ -24,7 +24,7 @@ function PrivateLayoutRoute(props) {
         )
     } else {
         return (
-            <Redirect to="/"/>
+            <Redirect to="/login"/>
         )
     }
 }

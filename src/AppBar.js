@@ -15,8 +15,8 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { UserContext } from './UserContext'
 
-const pages = ['Home', 'Registration'];
-const paths = ['/', '/registration'];
+const pages = ['Home', 'Login'];
+const paths = ['/', '/login'];
 
 const settings = ['Profile', 'Logout'];
 const settingsPath = ['/profile']
@@ -24,7 +24,7 @@ const settingsPath = ['/profile']
 const ResponsiveAppBar = () => {
 
 
-  const { avatar, updateUser } = React.useContext( UserContext );
+  const { avatar, loggedIn, updateUser } = React.useContext( UserContext );
 
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
@@ -50,7 +50,7 @@ const ResponsiveAppBar = () => {
     localStorage.clear();
 
     // Reset the UserContext component
-    updateUser({})
+    updateUser({loggedIn: false})
 
     setAnchorElUser(null);
   }
@@ -107,11 +107,18 @@ const ResponsiveAppBar = () => {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
+              {pages.map((page, i) => {
+                  
+                  if ((page === 'Login' && loggedIn === false) || page !== 'Login') {
+                    return(
+                      <MenuItem key={page} onClick={handleCloseNavMenu}>
+                        <LinkComponent to={paths[i]} textAlign="center">{page}</LinkComponent>
+                      </MenuItem>
+                    )
+                  }
+        
+              }
+              )}
             </Menu>
           </Box>
           <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -134,52 +141,61 @@ const ResponsiveAppBar = () => {
             LOGO
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page, i) => (
-              <Button
-                component={LinkComponent}
-                key={page}
-                to={paths[i]}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
+            {pages.map((page, i) => {
+              console.log( page, loggedIn)
+              if ((page === 'Login' && loggedIn === false) || page !== 'Login') {
+                return(<Button
+                  component={LinkComponent}
+                  key={page}
+                  to={paths[i]}
+                  sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                  {page}
+                </Button>)
+              }
+            })}
           </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src={avatar} />
-              </IconButton>
-            </Tooltip>
-            <Menu
-              sx={{ mt: '45px' }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting, i) => (
-                
-                setting === 'Logout' ? 
-                <MenuItem key={setting} onClick={logoutAndCloseMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem> :
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <LinkComponent to={settingsPath[i]}>{setting}</LinkComponent>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
+          {
+            loggedIn &&
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src={avatar} />
+                </IconButton>
+              </Tooltip>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting, i) => (
+                  
+                  setting === 'Logout' ? 
+                  <MenuItem key={setting} onClick={logoutAndCloseMenu}>
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem> :
+                  <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                    <LinkComponent to={settingsPath[i]}>{setting}</LinkComponent>
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Box>
+          }
+
+
+
         </Toolbar>
       </Container>
     </AppBar>

@@ -105,6 +105,7 @@ function RegistrationScreen() {
                     }
                     else {
                         setFormState("backend error");
+                        setErrorsState([jsonResponse.message]);
                     }
                 }
             )
@@ -211,6 +212,17 @@ function RegistrationScreen() {
 
                 { 
                     formState === "client error" &&
+                    <Alert severity="error">
+                        <ul>
+                        {
+                            errorsState.map(addListItem)
+                        }
+                        </ul>
+                    </Alert>
+                }
+
+                { 
+                    formState === "backend error" &&
                     <Alert severity="error">
                         <ul>
                         {

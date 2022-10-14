@@ -1,4 +1,5 @@
 import { useState, useContext } from 'react';
+import { Route, Redirect } from 'react-router-dom';
 import { UserContext } from './UserContext.js';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
@@ -17,7 +18,7 @@ function LoginScreen() {
 
     var [formState, setFormState] = useState(null);
     var [errorsState, setErrorsState] = useState([]);
-    var { updateUser } = useContext(UserContext);
+    var { loggedIn, updateUser } = useContext(UserContext);
 
 
     // 1. Declare variables (not defined)
@@ -28,7 +29,7 @@ function LoginScreen() {
     // Create a JS object like an HTML form element 
     var formData = new FormData();
 
-    function register() {
+    function login() {
 
 
         // 2. Validate the fields
@@ -75,7 +76,7 @@ function LoginScreen() {
                 // 7. If backend sends success, go to "success"
                 function(jsonResponse) {
                     if(jsonResponse.status === "ok") {
-                        console.log('backend response /users/register', jsonResponse)
+                        console.log('backend response /users/login', jsonResponse)
                         setFormState("success");
 
                         // Update the user context
@@ -85,7 +86,8 @@ function LoginScreen() {
                                 "firstName": jsonResponse.message.firstName,
                                 "lastName": jsonResponse.message.lastName,
                                 "avatar": jsonResponse.message.avatar,
-                                "jsonwebtoken": jsonResponse.message.jsonwebtoken
+                                "jsonwebtoken": jsonResponse.message.jsonwebtoken,
+                                "loggedIn": true
                             }
                         )
                     }
@@ -97,7 +99,7 @@ function LoginScreen() {
             .catch(
                 // 8. If backends sends error, go to "backend error"
                 function(backendError) {
-                    console.log('backendError at /users/register', backendError)
+                    console.log('backendError at /users/login', backendError)
                     setFormState("backend error");
                 }
             )
@@ -108,71 +110,78 @@ function LoginScreen() {
         return <li>{str}</li>
     }
 
-    return (
-        <Container maxWidth="sm">
-            <Box pt={8}>
-                <Typography component="h1" variant="h2">
-                    Login
-                </Typography>
-            </Box>
+    if(loggedIn || formState === "success") {
+        return (
+            <Redirect to="/" />
+        )
+    }
+    else {
+        return (
+            <Container maxWidth="sm">
+                <Box pt={8}>
+                    <Typography component="h1" variant="h2">
+                        Login
+                    </Typography>
+                </Box>
 
-            <Box mt={4} mb={2}>
-                <FormControl fullWidth sx={{ mb: 2 }}>
-                    <TextField 
-                    inputRef={ 
-                        function( thisElement ){
-                            emailField = thisElement;
-                        } 
-                    }
-                    label="Email" required={true}/>
-                </FormControl>
-
-                <FormControl fullWidth sx={{ mb: 2 }}>
-                    <TextField 
-                    inputRef={ 
-                        function( thisElement ){
-                            passwordField = thisElement;
-                        } 
-                    }
-                    label="Password" required={true} />
-                </FormControl>
-            </Box>
-
-            <Box display="flex">
-                
-                {
-                    formState !== "loading" &&
-                    <Button onClick={register} size="large" variant="contained">Send</Button>
-                }
-                
-                {
-                    formState === "loading" &&
-                    <CircularProgress />
-                }
-            </Box>
-
-            <Box mt={2}>
-
-                { 
-                    formState === "client error" &&
-                    <Alert severity="error">
-                        <ul>
-                        {
-                            errorsState.map(addListItem)
+                <Box mt={4} mb={2}>
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <TextField 
+                        inputRef={ 
+                            function( thisElement ){
+                                emailField = thisElement;
+                            } 
                         }
-                        </ul>
-                    </Alert>
-                }
+                        label="Email" required={true}/>
+                    </FormControl>
 
-                {
-                    formState === "success" &&
-                    <Alert severity="success">
-                        You have logged in successfully!
-                    </Alert>
-                }
-            </Box>
-        </Container>
-    )
+                    <FormControl fullWidth sx={{ mb: 2 }}>
+                        <TextField 
+                        inputRef={ 
+                            function( thisElement ){
+                                passwordField = thisElement;
+                            } 
+                        }
+                        label="Password" required={true} />
+                    </FormControl>
+                </Box>
+
+                <Box display="flex">
+                    
+                    {
+                        formState !== "loading" &&
+                        <Button onClick={login} size="large" variant="contained">Send</Button>
+                    }
+                    
+                    {
+                        formState === "loading" &&
+                        <CircularProgress />
+                    }
+                </Box>
+
+                <Box mt={2}>
+
+                    { 
+                        formState === "client error" &&
+                        <Alert severity="error">
+                            <ul>
+                            {
+                                errorsState.map(addListItem)
+                            }
+                            </ul>
+                        </Alert>
+                    }
+
+                    {
+                        formState === "success" &&
+                        <Alert severity="success">
+                            You have logged in successfully!
+                        </Alert>
+                    }
+                </Box>
+            </Container>
+        )
+    }
 
 }
 
